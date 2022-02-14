@@ -1,0 +1,64 @@
+version: '3'
+
+services:
+
+  database:
+    image: postgres:alpine3.15
+    volumes:
+      - type: bind
+        source: ./database
+        target: /var/lib/postgresql/data/
+    ports:
+      - 5432:5432
+    networks:
+      - infrastructure
+    env_file: ./setup/.env[MODEL]
+    environment:
+      - POSTGRES_USER=admin@test
+      - POSTGRES_PASSWORD=admin@test@1234
+      - POSTGRES_DB=warehouse_prod
+
+  rest_api:
+    container_name: manager
+    build: 
+      context: .
+      dockerfile: dockerfile_api
+    networks:
+      - infrastructure
+    ports:
+      - 80:80
+    env_file: ./setup/.env[MODEL]
+    depends_on:
+     - database
+    command: gunicorn platform_api.wsgi --bind 0.0.0.0:80 --workers 2
+    #command: gunicorn platform_api.asgi.application -k uvicorn.workers.UvicornWorker --workers 2
+    #command: python3 manage.py runserver
+
+  pipeline:
+    container_name: processer
+    build: 
+      context: .
+      dockerfile: dockerfile_app
+    volumes:
+      - type: bind
+        source: ./lake
+        target: /usr/app/lake
+    networks:
+      - infrastructure
+    #ports:
+    #  - 80:81
+    env_file: ./setup/.env[MODEL]
+    depends_on:
+     - rest_api
+     - database
+    command: python3 app.py
+
+
+networks:
+  infrastructure:
+
+
+volumes:
+  lake:
+  database:
+

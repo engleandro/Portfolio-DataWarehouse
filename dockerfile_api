@@ -1,0 +1,21 @@
+FROM python:alpine3.15
+
+WORKDIR /usr/api
+
+RUN apk add --virtual .build-deps g++ libffi-dev python3-dev postgresql-dev musl-dev libpq-dev postgresql postgresql-contrib \
+    && apk add --update python3
+
+RUN pip3 install --no-cache-dir --upgrade pip setuptools wheel
+
+COPY ./setup/ ./setup/
+RUN pip install -r ./setup/packages_api
+
+#COPY ./entrypoint.sh ./entrypoint.sh
+#RUN chmod +x /usr/app/entrypoint.sh
+
+COPY . .
+
+EXPOSE 80 81
+EXPOSE 8000
+
+#ENTRYPOINT ["/usr/src/app/entrypoint.sh"]

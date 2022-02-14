@@ -1,0 +1,11 @@
+[REST_API]
+DJANGO_SECRET_KEY=django-secure-token
+
+[DJANGO-REST-API]
+DB_SQL_ENGINE=django.db.backends.postgresql_psycopg2
+DB_SQL_HOSTNAME=localhost
+DB_SQL_PORT=5432
+DB_SQL_USERNAME=your-username
+DB_SQL_PASSWORD=your-password
+DB_SQL_INITDB=database-name
+
